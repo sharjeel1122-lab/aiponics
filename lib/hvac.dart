@@ -216,10 +216,10 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () async {
                           if (mpump) {
-                            mqttClientWrapper.publish('FanControl', '11011000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11011000000');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11010000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11010000000');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {

@@ -3,6 +3,7 @@ import 'package:aiponics/dashboard.dart';
 import 'package:aiponics/hvac.dart';
 import 'package:aiponics/mqtt_service.dart';
 import 'package:aiponics/waterflow.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 
 MqttClientWrapper mqttClientWrapper = MqttClientWrapper();
@@ -15,24 +16,68 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _isConnected = false;
+  bool isConnecting = false;
+
+
+
   @override
   void initState() {
     super.initState();
-    _connectToMqttServer();
-  }
-
-  bool isConnected = false;
-
-  void _connectToMqttServer() async {
-    mqttClientWrapper.connect();
-    // Simulating connection to MQTT server
-    // Assume some logic here to connect
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() {
-      isConnected = true;
+    _checkInternetAndConnect();
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      if (result == ConnectivityResult.none) {
+        setState(() {
+          _isConnected = false;
+        });
+      } else {
+        _checkInternetAndConnect();
+      }
     });
   }
+
+  void _checkInternetAndConnect() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      setState(() {
+        _isConnected = false;
+      });
+    } else {
+      if (!_isConnected && !isConnecting) { // Only connect if not already connected or connecting
+        setState(() {
+          isConnecting = true;
+        });
+        await _connectToMqttServer();
+      }
+    }
+  }
+
+
+  Future<void> _connectToMqttServer() async {
+    await mqttClientWrapper.connect(); // Wait for connection
+    setState(() {
+      _isConnected = mqttClientWrapper.isConnected;
+      isConnecting = false;
+    });
+    if (_isConnected) {
+      mqttClientWrapper.stv('admin2/monitoringsystem2'); // Subscribe to MQTT topic
+    }
+  }
+
+
+
+
+
+
+  /*void _connectToMqttServer() async {
+    await mqttClientWrapper.connect(); // Wait for connection
+    setState(() {
+      isConnected = mqttClientWrapper.isConnected;
+    });
+    if (isConnected) {
+      mqttClientWrapper.stv('admin2/monitoringsystem2'); // Subscribe to MQTT topic
+    }
+  }*/
 
   int _selectedIndex = 0;
   final List<String> _appBarTitles = ['Dashboard', 'HVAC', 'Water Flow', 'About'];
@@ -65,14 +110,14 @@ class _MyHomePageState extends State<MyHomePage> {
             margin: const EdgeInsets.only(right: 17),
             child: ElevatedButton(
               onPressed: () {
-                if (!isConnected) {
+
                   _connectToMqttServer();
-                }
+
               },
               child: Row(
                 children: [
                   Text(
-                    isConnected ? 'Connected' : 'Connecting...',
+                    _isConnected ? 'Connected' : 'Connecting...',
                     style: const TextStyle(color: Color.fromRGBO(42, 40, 70, 1)),
                   ),
                   const SizedBox(
@@ -81,9 +126,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(
                     width: 13,
                     child: CircleAvatar(
-                      backgroundColor: isConnected
+                      backgroundColor: _isConnected
                           ? const Color.fromRGBO(0, 72, 0, 1)
-                          : Colors.red, // You can change the icon as needed
+                          : Colors.red, // Change indicator color based on connection state
                     ),
                   ),
                 ],
@@ -92,10 +137,24 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 400),
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: Stack(
+        children:[
+
+          AnimatedSwitcher(
+          duration: const Duration(milliseconds: 400),
+          child: _widgetOptions.elementAt(_selectedIndex),
+        ),
+          if (!_isConnected)
+              Container(
+                color: Colors.white.withOpacity(0.8),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    color: Color.fromRGBO(0, 72, 0, 1),
+                  ),
+                ),
+              ),
+
+      ]),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: const Color.fromRGBO(0, 72, 0, 1), // Active icon color
         unselectedItemColor: Colors.black, // Inactive icon color

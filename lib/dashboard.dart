@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:aiponics/home.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
@@ -14,13 +15,19 @@ class _DashboardState extends State<Dashboard> {
 
   late Timer _timer;
   late String formattedDateTime;
-  double needleValue  = 40;
+  double temp= 0;
+
+
+
+
+
 
 
   @override
   void initState() {
     super.initState();
     _startTimer();
+
   }
 
   @override
@@ -31,7 +38,9 @@ class _DashboardState extends State<Dashboard> {
 
 
 
-  
+
+
+
 
 
 
@@ -52,6 +61,7 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+
 
 
     return Scaffold(
@@ -83,71 +93,69 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ],
             ),
-            GestureDetector(
-              onTap: () {
 
-              },
-              child: Center(
-                  child: SizedBox(
-                    width: 250,
-                    height: 250,
-                    child: SfRadialGauge(
-                      axes: [
-                        RadialAxis(
-                          maximum: 60,
-                          ranges: <GaugeRange>[
-                            GaugeRange(
-                                startValue: -10,
-                                endValue: 60,
-                                startWidth: 0.1,
-                                sizeUnit: GaugeSizeUnit.factor,
-                                endWidth: 0.1,
-                                gradient: const SweepGradient(stops: <double>[
-                                  0.2,
-                                  0.5,
-                                  0.75
-                                ], colors: <Color>[
-                                  Colors.green,
-                                  Colors.yellow,
-                                  Colors.red
-                                ])),
-                          ],
-                          pointers:  [
-                            NeedlePointer(
-                                value: needleValue,
-                                needleColor: const Color.fromRGBO(27, 20, 62, 1),
-                                tailStyle: const TailStyle(
-                                    length: 0.18,
-                                    width: 8,
-                                    color: Color.fromRGBO(27, 20, 62, 1),
-                                    lengthUnit: GaugeSizeUnit.factor),
-                                needleLength: 0.68,
-                                needleStartWidth: 1,
-                                needleEndWidth: 8,
-                                knobStyle: const KnobStyle(
-                                    knobRadius: 0.07,
-                                    color: Colors.white,
-                                    borderWidth: 0.05,
-                                    borderColor: Color.fromRGBO(3, 67, 1, 1)),
-                                lengthUnit: GaugeSizeUnit.factor)
-                          ],
-                          annotations: const <GaugeAnnotation>[
-                            GaugeAnnotation(
-                                widget: Text(
-                                  '°C',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color.fromRGBO(27, 20, 62, 1)),
-                                ),
-                                positionFactor: 0.8,
-                                angle: 90)
-                          ],
-                        )
-                      ],
-                    ),
-                  )),
-            ),
+
+
+            Center(
+                child: SizedBox(
+                  width: 250,
+                  height: 240,
+                  child: SfRadialGauge(
+                    axes: [
+                      RadialAxis(
+                        maximum: 60,
+                        ranges: <GaugeRange>[
+                          GaugeRange(
+                              startValue: -10,
+                              endValue: 60,
+                              startWidth: 0.1,
+                              sizeUnit: GaugeSizeUnit.factor,
+                              endWidth: 0.1,
+                              gradient: const SweepGradient(stops: <double>[
+                                0.2,
+                                0.5,
+                                0.75
+                              ], colors: <Color>[
+                                Colors.green,
+                                Colors.yellow,
+                                Colors.red
+                              ])),
+                        ],
+                        pointers:   [
+                          NeedlePointer(
+                              value: mqttClientWrapper.temp,
+                              needleColor: const Color.fromRGBO(27, 20, 62, 1),
+                              tailStyle: const TailStyle(
+                                  length: 0.18,
+                                  width: 8,
+                                  color: Color.fromRGBO(27, 20, 62, 1),
+                                  lengthUnit: GaugeSizeUnit.factor),
+                              needleLength: 0.68,
+                              needleStartWidth: 1,
+                              needleEndWidth: 8,
+                              knobStyle: const KnobStyle(
+                                  knobRadius: 0.07,
+                                  color: Colors.white,
+                                  borderWidth: 0.05,
+                                  borderColor: Color.fromRGBO(3, 67, 1, 1)),
+                              lengthUnit: GaugeSizeUnit.factor)
+                        ],
+                        annotations:  <GaugeAnnotation>[
+                          GaugeAnnotation(
+                              widget: Text(
+                                '${mqttClientWrapper.temp}°C',
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color.fromRGBO(27, 20, 62, 1)),
+                              ),
+                              positionFactor: 0.8,
+                              angle: 90)
+                        ],
+                      )
+                    ],
+                  ),
+                )),
 
 
             Center(
@@ -157,7 +165,8 @@ class _DashboardState extends State<Dashboard> {
                   child: SfRadialGauge(
                     axes: [
                       RadialAxis(
-                        maximum: 120,
+                        minimum: 0,
+                        maximum: 90,
                         ranges: <GaugeRange>[
                           GaugeRange(
                               startValue: -20,
@@ -179,11 +188,11 @@ class _DashboardState extends State<Dashboard> {
 
                               ])),
                         ],
-                        pointers: const [
+                        pointers:  [
                           NeedlePointer(
-                              value: 60,
-                              needleColor: Color.fromRGBO(27, 20, 62, 1),
-                              tailStyle: TailStyle(
+                              value: mqttClientWrapper.humi,
+                              needleColor: const Color.fromRGBO(27, 20, 62, 1),
+                              tailStyle: const TailStyle(
                                   length: 0.18,
                                   width: 8,
                                   color: Color.fromRGBO(27, 20, 62, 1),
@@ -191,19 +200,19 @@ class _DashboardState extends State<Dashboard> {
                               needleLength: 0.68,
                               needleStartWidth: 1,
                               needleEndWidth: 8,
-                              knobStyle: KnobStyle(
+                              knobStyle: const KnobStyle(
                                   knobRadius: 0.07,
                                   color: Colors.white,
                                   borderWidth: 0.05,
                                   borderColor: Color.fromRGBO(3, 67, 1, 1)),
                               lengthUnit: GaugeSizeUnit.factor)
                         ],
-                        annotations: const <GaugeAnnotation>[
+                        annotations: <GaugeAnnotation>[
                           GaugeAnnotation(
                               widget: Text(
-                                'Humidity',
-                                style: TextStyle(
-                                    fontSize: 20,
+                                '${mqttClientWrapper.humi} Humidity',
+                                style: const TextStyle(
+                                    fontSize: 16,
                                     fontWeight: FontWeight.w600,
                                     color: Color.fromRGBO(27, 20, 62, 1)),
                               ),

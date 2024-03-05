@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -5,25 +7,32 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 String receive = '';
 
 
+
 class MqttClientWrapper with ChangeNotifier {
   MqttServerClient? client;
   bool _isConnected = false;
   bool get isConnected => _isConnected;
+  double temp = 0;
+  double humi = 0;
+
+
+
+
 
   Future<void> connect() async {
     client = MqttServerClient(
-        '0f84faf18b2d426b9e777d4d7487166b.s2.eu.hivemq.cloud',
-        '0f84faf18b2d426b9e777d4d7487166b');
+        'efb965ce5b544c28b2d64bec436a524d.s1.eu.hivemq.cloud',
+        'efb965ce5b544c28b2d64bec436a524d');
     client!.port = 8883; // If using secure connection
     client!.secure = true; // If using secure connection
 
     final MqttConnectMessage connMess = MqttConnectMessage()
-        .withClientIdentifier('0f84faf18b2d426b9e777d4d7487166b')
+        .withClientIdentifier('efb965ce5b544c28b2d64bec436a524d')
         .startClean() // Start with a clean session
-        .withWillTopic('FanControl')
-        .withWillMessage('Hello Fan MQTT')
+        .withWillTopic('admin2/monitoringsystem2')
+        .withWillMessage('Successfully Connected')
         .withWillQos(MqttQos.atLeastOnce)
-        .authenticateAs('sharjeel1', 'Qwerty007');
+        .authenticateAs('admin', 'ATmega32u');
     client!.connectionMessage = connMess;
 
     try {
@@ -80,34 +89,40 @@ class MqttClientWrapper with ChangeNotifier {
   }
 
 
-  void stv(MqttClient client, String topicName) {
+
+ void stv(String topicName) {
     print('Subscribing to the $topicName topic');
+    client!.subscribe(topicName, MqttQos.atMostOnce);
+    //print the message when it is received
+    client!.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
+      final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
+      var message =
+      MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+      print('YOU GOT A NEW MESSAGE:');
+      print(message);
+      // Assuming temperature value is at a specific position in the message
+      // You can extract it using substring
+      if (message.length >= 15) { // Assuming the message has at least 20 characters
+        String temperatureString = message.substring(12, 14); // Extract temperature value from position 6 to 10
+        String humiString = message.substring(10, 12);
+        // Parse temperature value to double
+        double temperature = double.tryParse(temperatureString) ?? 0.0;
+        // Store the temperature value in a variable or use it as needed
+        double humidity = double.tryParse(humiString) ?? 0.0;
 
-    if (client != null) {
-      client.subscribe(topicName, MqttQos.atMostOnce);
-
-      client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
-        final MqttPublishMessage recMess = c[0].payload as MqttPublishMessage;
-        var message =
-        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-
-        print('YOU GOT A NEW MESSAGE:');
-        print(message);
-
-        int tempV = int.parse(message.substring(10, 12));
-        int splitValue = int.parse(message.substring(12, 14));
-
-        print('Temp Value: $tempV, Humidity Value: $splitValue');
-
-        receive = message;
-        notifyListeners();
-      });
-
-      print('Successfully subscribed to the $topicName topic');
-    } else {
-      print('Error: MqttClient is null');
-    }
+        print('Temperature: $temperature');
+        print('Humidity: $humidity');
+        // Now you can store the temperature value in a variable or use it as needed
+        // For example, you could have a class-level variable to store the temperature value
+        // For simplicity, I'm assuming receive is a class-level variable
+        temp = temperature;
+        humi = humidity;
+      } else {
+        print('Invalid message format');
+      }
+    });
   }
+
 
 
 
