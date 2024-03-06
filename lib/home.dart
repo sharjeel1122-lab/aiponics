@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
       isConnecting = false;
     });
     if (_isConnected) {
-      mqttClientWrapper.stv('admin2/monitoringsystem2'); // Subscribe to MQTT topic
+    mqttClientWrapper.stv('admin2/monitoringsystem2'); // Subscribe to MQTT topic
     }
   }
 

@@ -29,9 +29,9 @@ class About extends StatelessWidget {
 
 
           ElevatedButton(onPressed: (){
-                      mqttClientWrapper.stv('admin2/monitoringsystem2');
+                      mqttClientWrapper.subscribeToTopic('admin2/controlpanel');
           }, child: Text(
-            'sub'
+            'subscribe'
           ))
         ],
       )

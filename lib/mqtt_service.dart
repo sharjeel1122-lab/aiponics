@@ -12,8 +12,10 @@ class MqttClientWrapper with ChangeNotifier {
   MqttServerClient? client;
   bool _isConnected = false;
   bool get isConnected => _isConnected;
-  double temp = 0;
-  double humi = 0;
+  int ftemp = 0;
+  int fhumi = 0;
+  int etemp = 0;
+  int ehumi = 0;
 
 
 
@@ -67,6 +69,9 @@ class MqttClientWrapper with ChangeNotifier {
     print(message);
   }
 
+
+
+
   void subscribeToTopic(String topicName) {
     print('Subscribing to the $topicName topic');
     client!.subscribe(topicName, MqttQos.atMostOnce);
@@ -81,6 +86,7 @@ class MqttClientWrapper with ChangeNotifier {
 
     });
   }
+
   void updateConnectionStatus(bool isConnected)
   {
     _isConnected = isConnected;
@@ -103,20 +109,34 @@ class MqttClientWrapper with ChangeNotifier {
       // Assuming temperature value is at a specific position in the message
       // You can extract it using substring
       if (message.length >= 15) { // Assuming the message has at least 20 characters
-        String temperatureString = message.substring(12, 14); // Extract temperature value from position 6 to 10
-        String humiString = message.substring(10, 12);
-        // Parse temperature value to double
-        double temperature = double.tryParse(temperatureString) ?? 0.0;
-        // Store the temperature value in a variable or use it as needed
-        double humidity = double.tryParse(humiString) ?? 0.0;
+        String ftemperatureString = message.substring(12, 14); // Extract temperature value from position 6 to 10
+        String fhumiString = message.substring(10, 12);
 
-        print('Temperature: $temperature');
-        print('Humidity: $humidity');
+        String etemperatureString = message.substring(16, 18); // Extract temperature value from position 6 to 10
+        String ehumiString = message.substring(18, 20);
+
+        // Parse temperature value to int
+        int ftemperature = int.tryParse(ftemperatureString) ?? 0;
+        // Store the temperature value in a variable or use it as needed
+        int fhumidity = int.tryParse(fhumiString) ?? 0;
+
+        int etemperature = int.tryParse(etemperatureString) ?? 0;
+        // Store the temperature value in a variable or use it as needed
+        int ehumidity = int.tryParse(ehumiString) ?? 0;
+
+        print('Temperature: $ftemperature');
+        print('Humidity: $fhumidity');
+
+        print('Ex Temperature: $etemperature');
+        print('Ex Humidity: $ehumidity');
         // Now you can store the temperature value in a variable or use it as needed
         // For example, you could have a class-level variable to store the temperature value
         // For simplicity, I'm assuming receive is a class-level variable
-        temp = temperature;
-        humi = humidity;
+        ftemp = ftemperature;
+        fhumi = fhumidity;
+
+        etemp = etemperature;
+        ehumi = ehumidity;
       } else {
         print('Invalid message format');
       }

@@ -116,7 +116,7 @@ class _HAVCState extends State<HVAC> {
     // Create an OverlayEntry to show the toast message
     overlayEntry = OverlayEntry(
         builder: (context) => Positioned(
-          bottom: 130.0, // Adjust position as needed
+          bottom: 60.0, // Adjust position as needed
           left: MediaQuery.of(context).size.width * 0.1,
           right: MediaQuery.of(context).size.width * 0.1,
           child: Material(
@@ -160,6 +160,20 @@ class _HAVCState extends State<HVAC> {
       overlayEntry.remove();
     });
   }
+     //Conversion Function
+  String binaryToHex(String binary) {
+    // Ensure that the binary string length is a multiple of 4
+    while (binary.length % 4 != 0) {
+      binary = '0$binary';
+    }
+    // Convert binary to decimal
+    int decimal = int.parse(binary, radix: 2);
+    // Convert decimal to hexadecimal
+    String hex = decimal.toRadixString(16).toUpperCase();
+    return hex;
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -216,11 +230,13 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () async {
                           if (mpump) {
-                            mqttClientWrapper.publish('admin2/controlpanel', '11011000000');
-                            showToast(context, 'Fan On', const Duration(seconds: 1));
+                            String mp=  binaryToHex('1000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '12$mp');
+                            showToast(context, 'Main Pump On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('admin2/controlpanel', '11010000000');
-                            showToast(context, 'Fan Off', const Duration(seconds: 1));
+                            String mp=  binaryToHex('0111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '12$mp');
+                            showToast(context, 'Main Pump Off', const Duration(seconds: 1));
                           }
                           setState(() {
                             mpump = !mpump;
@@ -250,12 +266,14 @@ class _HAVCState extends State<HVAC> {
                         onPressed: () async {
 
                           if (spump) {
-                            mqttClientWrapper.publish('FanControl', '11011000000');
-                            showToast(context, 'Fan On', const Duration(seconds: 1));
+                            String sp=  binaryToHex('0100');
+                            mqttClientWrapper.publish('admin2/controlpanel', '12$sp');
+                            showToast(context, 'Small Pump On', const Duration(seconds: 1));
 
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11010000000');
-                            showToast(context, 'Fan Off', const Duration(seconds: 1));
+                            String sp=  binaryToHex('1011');
+                            mqttClientWrapper.publish('admin2/controlpanel', '12$sp');
+                            showToast(context, 'Small Pump Off', const Duration(seconds: 1));
 
                           }
                           setState(() {
@@ -300,13 +318,14 @@ class _HAVCState extends State<HVAC> {
                       ignoring: isSwitched,
                       child: ElevatedButton(
                         onPressed: () async {
-
                           if (isMessage1) {
-                            mqttClientWrapper.publish('FanControl', '11011000000');
+                            String f1=  binaryToHex('1000000000000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f1');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
 
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11010000000');
+                            String f1=  binaryToHex('0111111111111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f1');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
 
                           }
@@ -340,10 +359,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () async {
                           if (isMessage2) {
-                            mqttClientWrapper.publish('FanControl', '11021000000');
+                            String f2=  binaryToHex('0100000000000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f2');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11020000000');
+                            String f2=  binaryToHex('1011111111111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f2');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -372,10 +393,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage3) {
-                            mqttClientWrapper.publish('FanControl', '11031000000');
+                            String f3=  binaryToHex('0010000000000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f3');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11030000000');
+                            String f3=  binaryToHex('1101111111111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f3');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -404,10 +427,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage4) {
-                            mqttClientWrapper.publish('FanControl', '11041000000');
+                            String f4=  binaryToHex('0001000000000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f4');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11040000000');
+                            String f4=  binaryToHex('1110111111111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f4');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -447,10 +472,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage5) {
-                            mqttClientWrapper.publish('FanControl', '11051000000');
+                            String f5=  binaryToHex('0000100000000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f5');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11050000000');
+                            String f5=  binaryToHex('1111011111111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f5');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -480,10 +507,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage6) {
-                            mqttClientWrapper.publish('FanControl', '11061000000');
+                            String f6=  binaryToHex('0000010000000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f6');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11060000000');
+                            String f6=  binaryToHex('1111101111111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f6');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -513,10 +542,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage7) {
-                            mqttClientWrapper.publish('FanControl', '11071000000');
+                            String f7=  binaryToHex('0000001000000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f7');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11070000000');
+                            String f7=  binaryToHex('1111110111111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f7');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -546,10 +577,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage8) {
-                            mqttClientWrapper.publish('FanControl', '11081000000');
+                            String f8=  binaryToHex('0000000100000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f8');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11080000000');
+                            String f8=  binaryToHex('1111111011111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f8');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -589,10 +622,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage9) {
-                            mqttClientWrapper.publish('FanControl', '11091000000');
+                            String f9=  binaryToHex('0000000010000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f9');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11090000000');
+                            String f9=  binaryToHex('1111111101111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f9');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -621,10 +656,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage10) {
-                            mqttClientWrapper.publish('FanControl', '11101000000');
+                            String f10=  binaryToHex('0000000001000000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f10');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11100000000');
+                            String f10=  binaryToHex('1111111110111111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f10');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -653,10 +690,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage11) {
-                            mqttClientWrapper.publish('FanControl', '11111000000');
+                            String f11=  binaryToHex('0000000000100000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f11');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11110000000');
+                            String f11=  binaryToHex('1111111111011111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f11');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -685,10 +724,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage12) {
-                            mqttClientWrapper.publish('FanControl', '11121000000');
+                            String f12=  binaryToHex('0000000000010000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f12');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11120000000');
+                            String f12=  binaryToHex('1111111111101111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f12');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -728,10 +769,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage13) {
-                            mqttClientWrapper.publish('FanControl', '11131000000');
+                            String f13=  binaryToHex('0000000000001000');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f13');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11130000000');
+                            String f13=  binaryToHex('1111111111110111');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f13');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -761,10 +804,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage14) {
-                            mqttClientWrapper.publish('FanControl', '11141000000');
+                            String f14=  binaryToHex('0000000000000100');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f14');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11140000000');
+                            String f14=  binaryToHex('1111111111111011');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f14');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -794,9 +839,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage15) {
-                            mqttClientWrapper.publish('FanControl', '11151000000');
+                            String f15=  binaryToHex('0000000000000010');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f15');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
+                            String f15=  binaryToHex('1111111111111101');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f15');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
@@ -826,10 +874,12 @@ class _HAVCState extends State<HVAC> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (isMessage16) {
-                            mqttClientWrapper.publish('FanControl', '11161000000');
+                            String f16=  binaryToHex('0000000000000001');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f16');
                             showToast(context, 'Fan On', const Duration(seconds: 1));
                           } else {
-                            mqttClientWrapper.publish('FanControl', '11160000000');
+                            String f16=  binaryToHex('1111111111111110');
+                            mqttClientWrapper.publish('admin2/controlpanel', '11$f16');
                             showToast(context, 'Fan Off', const Duration(seconds: 1));
                           }
                           setState(() {
